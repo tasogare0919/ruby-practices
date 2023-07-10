@@ -1,4 +1,4 @@
-
+#!/usr/bin/env ruby
 count = 1
 while count <= 20
     if count % 15 == 0 then
