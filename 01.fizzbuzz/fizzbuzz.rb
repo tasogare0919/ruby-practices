@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
-count = 1
-while count <= 20
+require 'debug'
+
+def fizzbuzz(count)
     if count % 15 == 0 then
         puts "FizzBuzz"
     elsif count % 5 == 0 then
@@ -10,5 +11,9 @@ while count <= 20
     else
         puts count
     end
-    count += 1  
+end
+
+(1..20).each do |count|
+    binding.break
+    fizzbuzz(count)
 end
