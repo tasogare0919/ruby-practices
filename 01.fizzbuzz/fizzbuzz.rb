@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 (1..20).each do |count|
-if count % 15 == 0 then
+	if count % 15 == 0 then
 		puts "FizzBuzz"
 	elsif count % 5 == 0 then
 			puts "Buzz"
