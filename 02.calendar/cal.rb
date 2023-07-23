@@ -10,7 +10,7 @@ def main()
   cal_last_day = Date.new(cal_year, cal_month, -1).day
   cal_wday_first = cal_first_day.wday
   cal_blank = "   " * cal_wday_first
-  puts "      #{cal_first_day.strftime("%B")} #{cal_year}"
+  puts "      #{cal_first_day.strftime("%m") + '月'} #{cal_year}"
   puts cal_weekday.join(' ')
   (1..cal_last_day).each do |day|
           print cal_blank if day == 1
