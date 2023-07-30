@@ -2,9 +2,9 @@
 require 'optparse'
 require 'date'
 
-def main()
-  cal_params_year, cal_params_month = cal_params_init()
-  cal_year, cal_month = cal_year_month_set(cal_params_year, cal_params_month)
+def main
+  argv_year, argv_month = year_and_month_from_argv
+  cal_year, cal_month = year_and_month_to_i_with_default(argv_year, argv_month)
   cal_weekday = ["日", "月", "火", "水", "木", "金", "土"]
   cal_first_day = Date.new(cal_year, cal_month, 1)
   cal_last_day = Date.new(cal_year, cal_month, -1).day
@@ -21,7 +21,7 @@ def main()
   end
 end 
 
-def cal_params_init
+def year_and_month_from_argv
   opt = OptionParser.new
   cal_params = {}
   opt.on('-y year', 'Calendar year designation') { |v| cal_params[:year] = v }
@@ -34,30 +34,20 @@ end
 
 def cal_validate_year(year)
   if year != nil && (year.to_i < 1970 || year.to_i > 2100)
-     puts "Invalid year: year #{year} not in range 1970..2100.Input year in range 1970..2100."
-     exit
+    abort "Invalid year: year #{year} not in range 1970..2100.Input year in range 1970..2100."
   end
 end
 
 def cal_validate_month(month)
   if month != nil && (month.to_i < 1 || month.to_i > 12)
-      puts "Invalid month: #{month} not in range 1..12.Input month in range 1..12."
-      exit
+    abort "Invalid month: #{month} not in range 1..12.Input month in range 1..12."
   end
 end
 
-def cal_year_month_set(year, month)
-  cal_year = if year == nil
-    Date.today.year
-  else
-    year.to_i
-  end
-  cal_month = if month == nil
-      Date.today.month
-  else 
-      month.to_i
-  end
-  return cal_year, cal_month
+def year_and_month_to_i_with_default(year, month)
+  year_with_default = year.nil? ? Date.today.year : year.to_i
+  month_with_default = month.nil? ? Date.today.month : month.to_i
+  return year_with_default, month_with_default
 end
 
-main()
+main
