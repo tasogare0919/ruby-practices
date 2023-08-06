@@ -16,7 +16,7 @@ def main
     print cal_blank if day == 1
     print day.to_s.rjust(2) + ' '
     if (cal_wday_first + day) % 7 == 0
-      print "\n"
+      puts
     end
   end
 end 
