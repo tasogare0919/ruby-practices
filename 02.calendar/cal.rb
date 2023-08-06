@@ -9,12 +9,11 @@ def main
   first_day = Date.new(year, month, 1)
   last_day = Date.new(year, month, -1).day
   wday_first = first_day.wday
-  puts(wday_first)
   blank = "   " * wday_first
   puts "      #{first_day.strftime("%m") + '月'} #{year}"
   puts weekday.join(" ")
+  print blank
   (1..last_day).each do |day|
-    print blank if day == 1
     print day.to_s.rjust(2) + " "
     if (wday_first + day) % 7 == 0
       puts
