@@ -15,10 +15,9 @@ def main
   print blank
   (1..last_day).each do |day|
     print day.to_s.rjust(2) + " "
-    if (wday_first + day) % 7 == 0
-      puts
-    end
+    puts if (wday_first + day) % 7 == 0
   end
+  puts if (wday_first + last_day ) % 7 != 0
 end 
 
 def year_and_month_from_argv
