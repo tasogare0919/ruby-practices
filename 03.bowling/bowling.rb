@@ -20,18 +20,20 @@ end
 
 point = 0
 frames.each.with_index do |frame, i|
-  if frame[0] != 10 && frame.sum != 10 || i >= 9
-    point += frame.sum
-  elsif frame[0] == 10 && i < 9
-    point += if !frames[i + 2].nil? && frames[i + 1][0].to_i == 10 && frames[i + 2][0].to_i == 10
+  point += if i >= 9
+             frame.sum
+           elsif frame[0] == 10
+             if !frames[i + 2].nil? && frames[i + 1][0].to_i == 10 && frames[i + 2][0].to_i == 10
                30
              elsif frames[i + 1].nil? == false && frames[i + 1][0].to_i == 10 && frames[i + 2][0].to_i != 10
                20 + frames[i + 2][0].to_i
              else
                10 + frames[i + 1][0].to_i + frames[i + 1][1].to_i
              end
-  elsif frame.sum == 10 && i < 9
-    point += 10 + frames[i + 1][0].to_i
-  end
+           elsif frame.sum == 10
+             10 + frames[i + 1][0].to_i
+           else
+             frame.sum
+           end
 end
 puts point
