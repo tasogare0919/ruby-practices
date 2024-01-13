@@ -4,7 +4,6 @@
 require 'fileutils'
 
 path = ARGV[0] || '.'
-color = "\e[0m"
 
 if File.directory?(path)
   Dir.glob("#{path}/*").each do |file|
@@ -24,5 +23,7 @@ def permission_color(file)
     "\e[34m"
   elsif stat.executable?
     "\e[31m"
+  else
+    "\e[0m"
   end
 end
