@@ -11,7 +11,7 @@ def permission_color(file)
   stat = File::Stat.new(file)
   if stat.directory?
     "\e[34m"
-  else 
+  else
     stat.executable? ? "\e[31m" : "\e[0m"
   end
 end
