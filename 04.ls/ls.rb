@@ -5,7 +5,7 @@ require 'fileutils'
 require 'io/console'
 
 path = ARGV[0] || '.'
-terminal_width = IO.console.winsize[1]
+columns = 3
 
 def permission_color(file)
   stat = File::Stat.new(file)
@@ -18,13 +18,15 @@ end
 
 if File.directory?(path)
   files = Dir.glob("#{path}/*").sort_by { |file| File.basename(file) }
-  max_length = files.max_by { |file| File.basename(file).length }.length
-  columns = terminal_width / (max_length + 1)
-  files.each_slice(columns) do |slice|
-    slice.each do |file|
-      filename = File.basename(file)
-      color = permission_color(file)
-      print "#{color}#{filename.ljust(max_length)}\e[0m "
+  max_length = files.map { |file| File.basename(file).length }.max
+  files = files.each_slice((files.size / columns.to_f).ceil).to_a
+  files.first.size.times do |i|
+    columns.times do |j|
+      next unless files[j] && files[j][i]
+
+      filename = File.basename(files[j][i])
+      color = permission_color(files[j][i])
+      print "#{color}#{filename.ljust(max_length)}\t\e[0m "
     end
     print "\n"
   end
