@@ -1,9 +1,5 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
-
-require 'fileutils'
-require 'io/console'
-
 path = ARGV[0] || '.'
 columns = 3
 
