@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
+
 path = ARGV[0] || '.'
 columns = 3
 
