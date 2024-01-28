@@ -29,7 +29,7 @@ if File.directory?(path)
     end
     print "\n"
   end
-elsif File.exist?(path)
+elsif File.file?(path)
   color = permission_color(path)
   print "#{color}#{File.basename(path)}\e[0m "
 else
