@@ -32,7 +32,7 @@ end
 
 def get_files(command_options, path)
   if command_options[:a]
-    Dir.glob(["#{path}/*", "#{path}/.."], File::FNM_DOTMATCH).sort_by { |file| File.basename(file) }
+    Dir.glob("#{path}/*", File::FNM_DOTMATCH).sort_by { |file| File.basename(file) }
   else
     Dir.glob("#{path}/*").sort_by { |file| File.basename(file) }
   end
