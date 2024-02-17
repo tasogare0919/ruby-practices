@@ -13,7 +13,7 @@ def command_options_from_argv
   options
 end
 
-def print_file_column(files, index, columns, max_length)
+def print_file_by_column(files, index, columns, max_length)
   columns.times do |j|
     next unless files[j] && files[j][index]
 
@@ -25,12 +25,12 @@ end
 
 def print_files(files, columns, max_length)
   files.first.size.times do |index|
-    print_file_column(files, index, columns, max_length)
+    print_file_by_column(files, index, columns, max_length)
     print "\n"
   end
 end
 
-def get_files(command_options, path)
+def fetch_and_sort_files(command_options, path)
   if command_options[:a]
     Dir.glob("#{path}/*", File::FNM_DOTMATCH).sort_by { |file| File.basename(file) }
   else
@@ -38,7 +38,7 @@ def get_files(command_options, path)
   end
 end
 
-def get_max_length(files)
+def display_max_length(files)
   files.map do |column|
     column.map { |file| File.basename(file).length }.max
   end
@@ -54,9 +54,9 @@ def permission_color(file)
 end
 
 def handle_directory(path, command_options, columns)
-  files = get_files(command_options, path)
+  files = fetch_and_sort_files(command_options, path)
   files = files.each_slice((files.size / columns.to_f).ceil).to_a
-  max_length = get_max_length(files)
+  max_length = display_max_length(files)
   print_files(files, columns, max_length)
 end
 
