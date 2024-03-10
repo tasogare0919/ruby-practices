@@ -43,7 +43,7 @@ end
 
 def display_max_lengths(files)
   files.map do |column|
-    column.map { |file| file.size }.max
+    column.map(&:size).max
   end
 end
 
@@ -57,9 +57,9 @@ def permission_color(file)
 end
 
 def handle_directory(path, command_options, columns)
-  sort_files = fetch_and_sort_files(command_options, path)
-  slice_sort_files = sort_files.each_slice((sort_files.size / columns.to_f).ceil).to_a
-  max_length = display_max_lengths(slice_sort_files)
+  files = fetch_and_sort_files(command_options, path)
+  files = files.each_slice((files.size / columns.to_f).ceil).to_a
+  max_length = display_max_lengths(files)
   print_files(files, columns, max_length)
 end
 
