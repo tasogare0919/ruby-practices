@@ -3,6 +3,8 @@
 
 require 'optparse'
 
+COLUMNS = 3
+
 def command_options_from_argv
   options = {}
   OptionParser.new do |opts|
@@ -13,34 +15,35 @@ def command_options_from_argv
   options
 end
 
-def print_file_by_column(files, index, columns, max_length)
-  columns.times do |j|
-    next unless files[j] && files[j][index]
+def print_file_by_column(files, rows, columns, max_length)
+  columns.times do |column|
+    next unless files[column] && files[column][rows]
 
-    filename = File.basename(files[j][index])
-    color = permission_color(files[j][index])
-    print "#{color}#{filename.ljust(max_length[j])}\t\e[0m "
+    filename = File.basename(files[column][rows])
+    color = permission_color(files[column][rows])
+    print "#{color}#{filename.ljust(max_length[column])}\t\e[0m "
   end
 end
 
 def print_files(files, columns, max_length)
-  files.first.size.times do |index|
-    print_file_by_column(files, index, columns, max_length)
+  files.first.size.times do |rows|
+    print_file_by_column(files, rows, columns, max_length)
     print "\n"
   end
 end
 
 def fetch_and_sort_files(command_options, path)
-  if command_options[:a]
-    Dir.glob("#{path}/*", File::FNM_DOTMATCH).sort_by { |file| File.basename(file) }
-  else
-    Dir.glob("#{path}/*").sort_by { |file| File.basename(file) }
-  end
+  files = if command_options[:a]
+            Dir.glob("#{path}/*", File::FNM_DOTMATCH)
+          else
+            Dir.glob("#{path}/*")
+          end
+  files.sort_by { |file| File.basename(file) }
 end
 
-def display_max_length(files)
+def display_max_lengths(files)
   files.map do |column|
-    column.map { |file| File.basename(file).length }.max
+    column.map { |file| file.size }.max
   end
 end
 
@@ -54,9 +57,9 @@ def permission_color(file)
 end
 
 def handle_directory(path, command_options, columns)
-  files = fetch_and_sort_files(command_options, path)
-  files = files.each_slice((files.size / columns.to_f).ceil).to_a
-  max_length = display_max_length(files)
+  sort_files = fetch_and_sort_files(command_options, path)
+  slice_sort_files = sort_files.each_slice((sort_files.size / columns.to_f).ceil).to_a
+  max_length = display_max_lengths(slice_sort_files)
   print_files(files, columns, max_length)
 end
 
@@ -76,10 +79,9 @@ def handle_path(path, command_options, columns)
 end
 
 def main
-  columns = 3
   command_options = command_options_from_argv
   path = ARGV[0] || '.'
-  handle_path(path, command_options, columns)
+  handle_path(path, command_options, COLUMNS)
   print "\n"
 end
 
