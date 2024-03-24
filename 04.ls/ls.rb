@@ -15,19 +15,19 @@ def command_options_from_argv
   options
 end
 
-def print_file_by_column(files, rows, columns, max_length)
-  columns.times do |column|
-    next unless files[column] && files[column][rows]
+def print_file_by_column(files, first_row_count, display_max_lengths)
+  COLUMNS.times do |column|
+    next unless files[column] && files[column][first_row_count]
 
-    filename = File.basename(files[column][rows])
-    color = permission_color(files[column][rows])
-    print "#{color}#{filename.ljust(max_length[column])}\t\e[0m "
+    filename = File.basename(files[column][first_row_count])
+    color = permission_color(files[column][first_row_count])
+    print "#{color}#{filename.ljust(display_max_lengths[column])}\t\e[0m "
   end
 end
 
-def print_files(files, columns, max_length)
-  files.first.size.times do |rows|
-    print_file_by_column(files, rows, columns, max_length)
+def print_files(files, display_max_lengths)
+  files.first.size.times do |first_row_count|
+    print_file_by_column(files, first_row_count, display_max_lengths)
     print "\n"
   end
 end
@@ -56,11 +56,11 @@ def permission_color(file)
   end
 end
 
-def handle_directory(path, command_options, columns)
+def handle_directory(path, command_options)
   files = fetch_and_sort_files(command_options, path)
-  files = files.each_slice((files.size / columns.to_f).ceil).to_a
-  max_length = display_max_lengths(files)
-  print_files(files, columns, max_length)
+  files = files.each_slice((files.size / COLUMNS.to_f).ceil).to_a
+  display_max_lengths = display_max_lengths(files)
+  print_files(files, display_max_lengths)
 end
 
 def handle_file(path)
@@ -68,9 +68,9 @@ def handle_file(path)
   print "#{color}#{File.basename(path)}\e[0m "
 end
 
-def handle_path(path, command_options, columns)
+def handle_path(path, command_options)
   if File.directory?(path)
-    handle_directory(path, command_options, columns)
+    handle_directory(path, command_options)
   elsif File.file?(path)
     handle_file(path)
   else
@@ -81,7 +81,7 @@ end
 def main
   command_options = command_options_from_argv
   path = ARGV[0] || '.'
-  handle_path(path, command_options, COLUMNS)
+  handle_path(path, command_options)
   print "\n"
 end
 
