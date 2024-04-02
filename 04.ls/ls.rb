@@ -33,7 +33,7 @@ end
 def fetch_and_sort_files(path)
   files = Dir.glob("#{path}/*")
   if COMMAND_OPTIONS[:r]
-    files.sort { |a, b| b <=> a }
+    files.sort_by { |file| File.basename(file) }.reverse
   else
     files.sort_by { |file| File.basename(file) }
   end
