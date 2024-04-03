@@ -30,13 +30,13 @@ def print_files(files, display_max_lengths)
   end
 end
 
+def sort_files(files)
+  files.sort_by { |file| File.basename(file)}
+end
+
 def fetch_and_sort_files(path)
   files = Dir.glob("#{path}/*")
-  if COMMAND_OPTIONS[:r]
-    files.sort_by { |file| File.basename(file) }.reverse
-  else
-    files.sort_by { |file| File.basename(file) }
-  end
+  sort_files(files).send(COMMAND_OPTIONS[:r] ? :reverse : :itself)
 end
 
 def display_max_lengths(files)
