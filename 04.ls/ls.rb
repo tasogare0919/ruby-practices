@@ -3,17 +3,15 @@
 
 require 'optparse'
 
-COLUMNS = 3
+options = {}
+OptionParser.new do |opts|
+  opts.on('-r', 'Reverse the order of the sort') do |v|
+    options[:r] = v
+  end
+end.parse!
 
-def command_options_from_argv
-  options = {}
-  OptionParser.new do |opts|
-    opts.on('-a', 'Include directory entries whose names begin with a dot (".")') do |v|
-      options[:a] = v
-    end
-  end.parse!
-  options
-end
+COMMAND_OPTIONS = options
+COLUMNS = 3
 
 def print_file_by_column(files, first_row_count, display_max_lengths)
   COLUMNS.times do |column|
@@ -32,13 +30,14 @@ def print_files(files, display_max_lengths)
   end
 end
 
-def fetch_and_sort_files(command_options, path)
-  files = if command_options[:a]
-            Dir.glob("#{path}/*", File::FNM_DOTMATCH)
-          else
-            Dir.glob("#{path}/*")
-          end
+def sort_files(files)
   files.sort_by { |file| File.basename(file) }
+end
+
+def fetch_and_sort_files(path)
+  files = Dir.glob("#{path}/*")
+  sorted_files = sort_files(files)
+  COMMAND_OPTIONS[:r] ? sorted_files.reverse : sorted_files
 end
 
 def display_max_lengths(files)
@@ -56,8 +55,8 @@ def permission_color(file)
   end
 end
 
-def handle_directory(path, command_options)
-  files = fetch_and_sort_files(command_options, path)
+def handle_directory(path)
+  files = fetch_and_sort_files(path)
   files = files.each_slice((files.size / COLUMNS.to_f).ceil).to_a
   display_max_lengths = display_max_lengths(files)
   print_files(files, display_max_lengths)
@@ -68,9 +67,9 @@ def handle_file(path)
   print "#{color}#{File.basename(path)}\e[0m "
 end
 
-def handle_path(path, command_options)
+def handle_path(path)
   if File.directory?(path)
-    handle_directory(path, command_options)
+    handle_directory(path)
   elsif File.file?(path)
     handle_file(path)
   else
@@ -79,9 +78,8 @@ def handle_path(path, command_options)
 end
 
 def main
-  command_options = command_options_from_argv
   path = ARGV[0] || '.'
-  handle_path(path, command_options)
+  handle_path(path)
   print "\n"
 end
 
