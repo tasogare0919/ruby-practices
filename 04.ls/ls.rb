@@ -140,7 +140,7 @@ def handle_long_format(path, files)
   total_blocks = calculate_total_blocks(path)
   puts "total #{total_blocks}"
   files.each do |file|
-    print_files([file], [])
+    print_files([[file]], [])
   end
 end
 
