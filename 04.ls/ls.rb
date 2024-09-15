@@ -13,6 +13,16 @@ end.parse!
 
 COMMAND_OPTIONS = options
 COLUMNS = 3
+PERMISSIONS = {
+  '7' => 'rwx',
+  '6' => 'rw-',
+  '5' => 'r-x',
+  '4' => 'r--',
+  '3' => '-wx',
+  '2' => '-w-',
+  '1' => '--x',
+  '0' => '---'
+}.freeze
 
 def file_mode(mode)
   type = file_type(mode)
@@ -33,9 +43,7 @@ def file_type(mode)
 end
 
 def file_permission(mode)
-  %w[r w x].map do |p|
-    [4, 2, 1].map { |b| mode & b != 0 ? p : '-' }.join
-  end.join
+  mode.to_s(8)[-3..].chars.map { |char| PERMISSIONS[char] }.join
 end
 
 def calculate_total_blocks(path)
