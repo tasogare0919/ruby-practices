@@ -2,85 +2,45 @@
 # frozen_string_literal: true
 
 require 'optparse'
+require 'etc'
 
-options = {}
-OptionParser.new do |opts|
-  opts.on('-r', 'Reverse the order of the sort') do |v|
-    options[:r] = v
+class LsCommand
+  COLUMNS = 3.freeze
+  PERMISSIONS = {
+    '7' => 'rwx',
+    '6' => 'rw-',
+    '5' => 'r-x',
+    '4' => 'r--',
+    '3' => '-wx',
+    '2' => '-w-',
+    '1' => '--x',
+    '0' => '---'
+  }.freeze
+
+  def initialize(args = ARGV)
+    @options = parse_options(args)
+    @path = args[0] || '.'
   end
-end.parse!
 
-COMMAND_OPTIONS = options
-COLUMNS = 3
-
-def print_file_by_column(files, first_row_count, display_max_lengths)
-  COLUMNS.times do |column|
-    next unless files[column] && files[column][first_row_count]
-
-    filename = File.basename(files[column][first_row_count])
-    color = permission_color(files[column][first_row_count])
-    print "#{color}#{filename.ljust(display_max_lengths[column])}\t\e[0m "
-  end
-end
-
-def print_files(files, display_max_lengths)
-  files.first.size.times do |first_row_count|
-    print_file_by_column(files, first_row_count, display_max_lengths)
+  def run
+    handle_path(@path)
     print "\n"
   end
-end
 
-def sort_files(files)
-  files.sort_by { |file| File.basename(file) }
-end
+  private
 
-def fetch_and_sort_files(path)
-  files = Dir.glob("#{path}/*")
-  sorted_files = sort_files(files)
-  COMMAND_OPTIONS[:r] ? sorted_files.reverse : sorted_files
-end
-
-def display_max_lengths(files)
-  files.map do |column|
-    column.map(&:size).max
+  def parse_options(args)
+    options = {}
+    OptionParser.new do |opts|
+      opts.on('-l', 'List files in the long format') do |v|
+        options[:l] = v
+      end
+    end.parse!
+    options
   end
+
 end
 
-def permission_color(file)
-  stat = File::Stat.new(file)
-  if stat.directory?
-    "\e[34m"
-  else
-    stat.executable? ? "\e[31m" : "\e[0m"
-  end
+if __FILE__ == $PROGRAM_NAME
+  LsCommand.new.run
 end
-
-def handle_directory(path)
-  files = fetch_and_sort_files(path)
-  files = files.each_slice((files.size / COLUMNS.to_f).ceil).to_a
-  display_max_lengths = display_max_lengths(files)
-  print_files(files, display_max_lengths)
-end
-
-def handle_file(path)
-  color = permission_color(path)
-  print "#{color}#{File.basename(path)}\e[0m "
-end
-
-def handle_path(path)
-  if File.directory?(path)
-    handle_directory(path)
-  elsif File.file?(path)
-    handle_file(path)
-  else
-    print "ls: #{path}: No such file or directory"
-  end
-end
-
-def main
-  path = ARGV[0] || '.'
-  handle_path(path)
-  print "\n"
-end
-
-main
